@@ -102,6 +102,21 @@ in {
     # Always add the configured `atuin` package.
     home.packages = [ cfg.package ];
 
+    systemd.user.services.atuin = mkIf cfg.settings.daemon.enabled {
+      Unit = {
+        Description = "Atuin daemon";
+        PartOf = ["default.target"];
+      };
+
+      Service = {
+        ExecStart = "${cfg.package}/bin/atuin daemon";
+      };
+
+      Install = {
+        WantedBy = ["default.target"];
+      };
+    };
+
     # If there are user-provided settings, generate the config file.
     xdg.configFile."atuin/config.toml" = mkIf (cfg.settings != { }) {
       source = tomlFormat.generate "atuin-config" cfg.settings;
