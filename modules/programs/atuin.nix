@@ -116,6 +116,20 @@ in {
         WantedBy = ["default.target"];
       };
     };
+    systemd.user.sockets.atuind = mkIf (cfg.settings.daemon.enabled
+      && cfg.settings.daemon.systemd_socket) {
+      Unit = {
+        Description = "Atuin daemon socket";
+      };
+
+      Socket = {
+        ListenStream = ".local/share/atuin/atuin.sock";
+      };
+
+      Install = {
+        WantedBy = ["sockets.target"];
+      };
+    };
 
     # If there are user-provided settings, generate the config file.
     xdg.configFile."atuin/config.toml" = mkIf (cfg.settings != { }) {
